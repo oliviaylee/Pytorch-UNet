@@ -141,8 +141,7 @@ class BasicDataset(Dataset):
     
     @staticmethod
     def preprocess_lang(lang_annot):
-        pass
-        return lang_annot
+        return ' '.join(lang_annot)
 
     def __getitem__(self, idx):
         name = self.ids[idx]
@@ -163,11 +162,13 @@ class BasicDataset(Dataset):
             f'Image and mask {name} should be the same size, but are {img.size} and {mask.size}'
 
         img = self.preprocess(self.mask_values, img, self.scale, is_mask=False)
-        mask = self.preprocess(self.mask_values, mask, self.scale, is_mask=True)
+        # mask = self.preprocess(self.mask_values, mask, self.scale, is_mask=True)
         traj = self.preprocess_trajectory(traj, img.size)
+        lang_annot = self.preprocess_lang(lang_annot)
 
         return {
             'image': torch.as_tensor(img.copy()).float().contiguous(),
             'mask': torch.as_tensor(mask.copy()).long().contiguous(),
-            'trajectory': torch.as_tensor(traj/copy()).float().contiguous()
+            'traj': torch.as_tensor(traj.copy()).float().contiguous()
+            'lang_annot': lang_annot.copy()
         }
